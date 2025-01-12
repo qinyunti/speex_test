@@ -208,7 +208,8 @@ int main(int argc, char **argv)
    char* mic_fname = argv[1];
    char* spk_fname = argv[2];
    char* out_fname = argv[3];
-
+   int ctl_i;
+   float ctl_f;
    if (argc != 4)
    {
       fprintf(stderr, "testecho mic.wav spk.wav out.wav\n");
@@ -285,7 +286,11 @@ int main(int argc, char **argv)
    st = speex_echo_state_init(NN, TAIL);
    den = speex_preprocess_state_init(NN, sampleRate);
    speex_echo_ctl(st, SPEEX_ECHO_SET_SAMPLING_RATE, &sampleRate);
-   speex_preprocess_ctl(den, SPEEX_PREPROCESS_SET_ECHO_STATE, st);
+
+   ctl_i=1;
+   speex_preprocess_ctl(den, SPEEX_PREPROCESS_SET_DENOISE, &ctl_i); /* 打开降噪 ctl_i=1打开 2关闭*/
+   ctl_i=-5;
+   speex_preprocess_ctl(den, SPEEX_PREPROCESS_SET_NOISE_SUPPRESS, &ctl_i); 
 
    times = samps / NN;   /* 一次读取NN个点,读取times次 */
    for(int i=0; i<times; i++)
