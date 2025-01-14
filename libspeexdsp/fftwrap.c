@@ -38,6 +38,7 @@
 
 #include "arch.h"
 #include "os_support.h"
+#include "fftwrap.h"
 
 #define MAX_FFT_SIZE 2048
 
@@ -79,7 +80,7 @@ static void renorm_range(spx_word16_t *in, spx_word16_t *out, int shift, int len
 #ifdef USE_SMALLFT
 
 #include "smallft.h"
-#include <math.h>
+#include "math_approx.h"
 
 void *spx_fft_init(int size)
 {
@@ -100,13 +101,13 @@ void spx_fft(void *table, float *in, float *out)
    if (in==out)
    {
       int i;
-      float scale = 1./((struct drft_lookup *)table)->n;
+      float scale = 1.0f/((struct drft_lookup *)table)->n;
       speex_warning("FFT should not be done in-place");
       for (i=0;i<((struct drft_lookup *)table)->n;i++)
          out[i] = scale*in[i];
    } else {
       int i;
-      float scale = 1./((struct drft_lookup *)table)->n;
+      float scale = 1.0f/((struct drft_lookup *)table)->n;
       for (i=0;i<((struct drft_lookup *)table)->n;i++)
          out[i] = scale*in[i];
    }
@@ -259,7 +260,7 @@ void spx_fft(void *table, spx_word16_t *in, spx_word16_t *out)
   const int N = t->N;
   float *iptr = t->in;
   float *optr = t->out;
-  const float m = 1.0 / N;
+  const float m = 1.0f / N;
   for(i=0;i<N;++i)
     iptr[i]=in[i] * m;
 
@@ -338,7 +339,7 @@ void spx_fft(void *table, spx_word16_t *in, spx_word16_t *out)
    int i;
    float scale;
    struct kiss_config *t = (struct kiss_config *)table;
-   scale = 1./t->N;
+   scale = 1.0f/t->N;
    kiss_fftr2(t->forward, in, out);
    for (i=0;i<t->N;i++)
       out[i] *= scale;
@@ -380,7 +381,7 @@ void spx_fft_float(void *table, float *in, float *out)
    spx_word16_t _out[MAX_FFT_SIZE];
 #endif
    for (i=0;i<N;i++)
-      _in[i] = (int)floor(.5+in[i]);
+      _in[i] = (int)spx_floor(.5f+in[i]);
    spx_fft(table, _in, _out);
    for (i=0;i<N;i++)
       out[i] = _out[i];
@@ -390,7 +391,7 @@ void spx_fft_float(void *table, float *in, float *out)
       float scale;
       struct drft_lookup t;
       spx_drft_init(&t, ((struct kiss_config *)table)->N);
-      scale = 1./((struct kiss_config *)table)->N;
+      scale = 1.0f/((struct kiss_config *)table)->N;
       for (i=0;i<((struct kiss_config *)table)->N;i++)
          out[i] = scale*in[i];
       spx_drft_forward(&t, out);
@@ -416,7 +417,7 @@ void spx_ifft_float(void *table, float *in, float *out)
    spx_word16_t _out[MAX_FFT_SIZE];
 #endif
    for (i=0;i<N;i++)
-      _in[i] = (int)floor(.5+in[i]);
+      _in[i] = (int)spx_floor(.5f+in[i]);
    spx_ifft(table, _in, _out);
    for (i=0;i<N;i++)
       out[i] = _out[i];

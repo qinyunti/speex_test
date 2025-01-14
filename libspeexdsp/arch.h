@@ -1,4 +1,4 @@
-/* Copyright (C) 2003 Jean-Marc Valin */
+﻿/* Copyright (C) 2003 Jean-Marc Valin */
 /**
    @file arch.h
    @brief Various architecture definitions Speex
@@ -91,10 +91,10 @@ typedef spx_word32_t spx_sig_t;
 
 #define LPC_SCALING  8192
 #define SIG_SCALING  16384
-#define LSP_SCALING  8192.
-#define GAMMA_SCALING 32768.
+#define LSP_SCALING  8192.f
+#define GAMMA_SCALING 32768.f
 #define GAIN_SCALING 64
-#define GAIN_SCALING_1 0.015625
+#define GAIN_SCALING_1 0.015625f
 
 #define LPC_SHIFT    13
 #define LSP_SHIFT    13
@@ -203,7 +203,7 @@ typedef float spx_word32_t;
 #define PDIV32(a,b)     (((spx_word32_t)(a))/(spx_word32_t)(b))
 
 #define WORD2INT(x) ((x) < -32767.5f ? -32768 : \
-                    ((x) > 32766.5f ? 32767 : (spx_int16_t)floor(.5 + (x))))
+                    ((x) > 32766.5f ? 32767 : (spx_int16_t)spx_floor(.5f + (x))))
 #endif
 
 

@@ -364,6 +364,7 @@ void kf_work(
         int m2
         )
 {
+   (void)s2;
    int i;
     kiss_fft_cpx * Fout_beg=Fout;
     const int p=*factors++; /* the radix  */
@@ -487,8 +488,8 @@ kiss_fft_cfg kiss_fft_alloc(int nfft,int inverse_fft,void * mem,size_t * lenmem 
         }
 #else
         for (i=0;i<nfft;++i) {
-           const double pi=3.14159265358979323846264338327;
-           double phase = ( -2*pi /nfft ) * i;
+           const float pi=3.14159265358979323846264338327f;
+           float phase = ( -2*pi /nfft ) * i;
            if (st->inverse)
               phase *= -1;
            kf_cexp(st->twiddles+i, phase );

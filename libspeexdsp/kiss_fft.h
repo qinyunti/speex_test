@@ -2,7 +2,7 @@
 #define KISS_FFT_H
 
 #include <stdlib.h>
-#include <math.h>
+#include "math_approx.h"
 #include "arch.h"
 
 #ifdef __cplusplus

@@ -62,5 +62,6 @@ void filterbank_compute_bank(FilterBank *bank, float *psd, float *mel);
 void filterbank_compute_psd(FilterBank *bank, float *mel, float *psd);
 #endif
 
+void filterbank_psy_smooth(FilterBank *bank, float *ps, float *mask);
 
 #endif

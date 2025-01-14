@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2008 Jean-Marc Valin
+﻿/* Copyright (C) 2007-2008 Jean-Marc Valin
    Copyright (C) 2008      Thorvald Natvig
 
    File: resample.c
@@ -61,6 +61,7 @@
 #include "config.h"
 #endif
 
+#ifdef USE_RESAMPLE
 #ifdef OUTSIDE_SPEEX
 #include <stdlib.h>
 static void *speex_alloc(int size) {return calloc(size,1);}
@@ -1240,3 +1241,5 @@ EXPORT const char *speex_resampler_strerror(int err)
          return "Unknown error. Bad error code or strange version mismatch.";
    }
 }
+
+#endif

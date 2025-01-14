@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 Jean-Marc Valin */
+﻿/* Copyright (C) 2006 Jean-Marc Valin */
 /**
    @file filterbank.c
    @brief Converting between psd and filterbank
@@ -37,7 +37,6 @@
 
 #include "filterbank.h"
 #include "arch.h"
-#include <math.h>
 #include "math_approx.h"
 #include "os_support.h"
 
@@ -46,13 +45,14 @@
 #define toBARK(n)   (MULT16_16(26829,spx_atan(SHR32(MULT16_16(97,n),2))) + MULT16_16(4588,spx_atan(MULT16_32_Q15(20,MULT16_16(n,n)))) + MULT16_16(3355,n))
 
 #else
-#define toBARK(n)   (13.1f*atan(.00074f*(n))+2.24f*atan((n)*(n)*1.85e-8f)+1e-4f*(n))
+#define toBARK(n)   (13.1f*spx_atan(.00074f*(n))+2.24f*spx_atan((n)*(n)*1.85e-8f)+1e-4f*(n))
 #endif
 
-#define toMEL(n)    (2595.f*log10(1.f+(n)/700.f))
+#define toMEL(n)    (2595.f*spx_log10(1.f+(n)/700.f))
 
 FilterBank *filterbank_new(int banks, spx_word32_t sampling, int len, int type)
 {
+   (void)type;
    FilterBank *bank;
    spx_word32_t df;
    spx_word32_t max_mel, mel_interval;
@@ -86,7 +86,7 @@ FilterBank *filterbank_new(int banks, spx_word32_t sampling, int len, int type)
 #ifdef FIXED_POINT
       id1 = DIV32(mel,mel_interval);
 #else
-      id1 = (int)(floor(mel/mel_interval));
+      id1 = (int)(spx_floor(mel/mel_interval));
 #endif
       if (id1>banks-2)
       {
@@ -213,8 +213,8 @@ void filterbank_psy_smooth(FilterBank *bank, float *ps, float *mask)
    filterbank_compute_bank(bank, ps, bark);
    for (i=1;i<bank->nb_banks;i++)
    {
-      /*float decay_high = 13-1.6*log10(bark[i-1]);
-      decay_high = pow(10,(-decay_high/30.f));*/
+      /*float decay_high = 13-1.6f*log10(bark[i-1]);
+      decay_high = spx_pow(10,(-decay_high/30.f));*/
       bark[i] = bark[i] + decay_high*bark[i-1];
    }
    for (i=bank->nb_banks-2;i>=0;i--)

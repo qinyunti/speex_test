@@ -1,4 +1,4 @@
-/********************************************************************
+﻿/********************************************************************
  *                                                                  *
  * THIS FILE IS PART OF THE OggVorbis SOFTWARE CODEC SOURCE CODE.   *
  * USE, DISTRIBUTION AND REPRODUCTION OF THIS LIBRARY SOURCE IS     *
@@ -31,6 +31,8 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#ifdef USE_SMALLFT
 
 #include <math.h>
 #include "smallft.h"
@@ -1259,3 +1261,5 @@ void spx_drft_clear(struct drft_lookup *l)
       speex_free(l->splitcache);
   }
 }
+
+#endif

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2003-2004, Mark Borgerding
 
 All rights reserved.
@@ -68,8 +68,8 @@ kiss_fftr_cfg kiss_fftr_alloc(int nfft,int inverse_fft,void * mem,size_t * lenme
     }
 #else
     for (i=0;i<nfft;++i) {
-       const double pi=3.14159265358979323846264338327;
-       double phase = pi*(((double)i) /nfft + .5);
+       const float pi=3.14159265358979323846264338327f;
+       float phase = pi*(((float)i) /nfft + .5f);
        if (!inverse_fft)
           phase = -phase;
        kf_cexp(st->super_twiddles+i, phase );
@@ -162,7 +162,7 @@ void kiss_fftri(kiss_fftr_cfg st,const kiss_fft_cpx *freqdata, kiss_fft_scalar *
         C_ADD (st->tmpbuf[k],     fek, fok);
         C_SUB (st->tmpbuf[ncfft - k], fek, fok);
 #ifdef USE_SIMD
-        st->tmpbuf[ncfft - k].i *= _mm_set1_ps(-1.0);
+        st->tmpbuf[ncfft - k].i *= _mm_set1_ps(-1.0f);
 #else
         st->tmpbuf[ncfft - k].i *= -1;
 #endif
@@ -288,7 +288,7 @@ void kiss_fftri2(kiss_fftr_cfg st,const kiss_fft_scalar *freqdata,kiss_fft_scala
       C_ADD (st->tmpbuf[k],     fek, fok);
       C_SUB (st->tmpbuf[ncfft - k], fek, fok);
 #ifdef USE_SIMD
-      st->tmpbuf[ncfft - k].i *= _mm_set1_ps(-1.0);
+      st->tmpbuf[ncfft - k].i *= _mm_set1_ps(-1.0f);
 #else
       st->tmpbuf[ncfft - k].i *= -1;
 #endif

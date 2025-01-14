@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2003-2004, Mark Borgerding
 
 All rights reserved.
@@ -11,9 +11,13 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
+#ifndef MIN
 #define MIN(a,b) ((a)<(b) ? (a):(b))
+#endif
+
+#ifndef MAX
 #define MAX(a,b) ((a)>(b) ? (a):(b))
+#endif
 
 /* kiss_fft.h
    defines kiss_fft_scalar as either short or a float type
@@ -130,17 +134,17 @@ struct kiss_fft_state{
 
 
 #ifdef FIXED_POINT
-#  define KISS_FFT_COS(phase)  floor(MIN(32767,MAX(-32767,.5+32768 * cos (phase))))
-#  define KISS_FFT_SIN(phase)  floor(MIN(32767,MAX(-32767,.5+32768 * sin (phase))))
+#  define KISS_FFT_COS(phase)  spx_floor(MIN(32767,MAX(-32767,.5f+32768 * spx_cos (phase))))
+#  define KISS_FFT_SIN(phase)  spx_floor(MIN(32767,MAX(-32767,.5f+32768 * spx_sin (phase))))
 #  define HALF_OF(x) ((x)>>1)
 #elif defined(USE_SIMD)
-#  define KISS_FFT_COS(phase) _mm_set1_ps( cos(phase) )
-#  define KISS_FFT_SIN(phase) _mm_set1_ps( sin(phase) )
-#  define HALF_OF(x) ((x)*_mm_set1_ps(.5))
+#  define KISS_FFT_COS(phase) _mm_set1_ps( spx_cos(phase) )
+#  define KISS_FFT_SIN(phase) _mm_set1_ps( spx_sin(phase) )
+#  define HALF_OF(x) ((x)*_mm_set1_ps(.5f))
 #else
-#  define KISS_FFT_COS(phase) (kiss_fft_scalar) cos(phase)
-#  define KISS_FFT_SIN(phase) (kiss_fft_scalar) sin(phase)
-#  define HALF_OF(x) ((x)*.5)
+#  define KISS_FFT_COS(phase) (kiss_fft_scalar) spx_cos(phase)
+#  define KISS_FFT_SIN(phase) (kiss_fft_scalar) spx_sin(phase)
+#  define HALF_OF(x) ((x)*.5f)
 #endif
 
 #define  kf_cexp(x,phase) \

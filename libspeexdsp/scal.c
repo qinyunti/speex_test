@@ -49,11 +49,11 @@ The algorithm implemented here is described in:
 #include "arch.h"
 #include "os_support.h"
 #include "smallft.h"
-#include <math.h>
+#include "math_approx.h"
 #include <stdlib.h>
 
 #ifndef M_PI
-#define M_PI           3.14159265358979323846  /* pi */
+#define M_PI           3.14159265358979323846f  /* pi */
 #endif
 
 #define ALLPASS_ORDER 20
@@ -106,7 +106,7 @@ EXPORT SpeexDecorrState *speex_decorrelate_new(int rate, int channels, int frame
    /*FIXME: The +20 is there only as a kludge for ALL_PASS_OLA*/
    st->vorbis_win = speex_alloc((2*frame_size+20)*sizeof(float));
    for (i=0;i<2*frame_size;i++)
-      st->vorbis_win[i] = sin(.5*M_PI* sin(M_PI*i/(2*frame_size))*sin(M_PI*i/(2*frame_size)) );
+      st->vorbis_win[i] = spx_sin(.5f*M_PI* spx_sin(M_PI*i/(2*frame_size))*spx_sin(M_PI*i/(2*frame_size)) );
    st->seed = rand();
 
    for (ch=0;ch<channels;ch++)
@@ -127,7 +127,7 @@ static float uni_rand(int *seed)
    union {int i; float f;} ran;
    *seed = 1664525 * *seed + 1013904223;
    ran.i = jflone | (jflmsk & *seed);
-   ran.f -= 1.5;
+   ran.f -= 1.5f;
    return 2*ran.f;
 }
 
@@ -148,11 +148,11 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
    if (strength>100)
       strength = 100;
 
-   amount = .01*strength;
+   amount = .01f*strength;
    for (ch=0;ch<st->channels;ch++)
    {
       int i;
-      int N=2*st->frame_size;
+      //int N=2*st->frame_size;
       float beta, beta2;
       float *x;
       float max_alpha = 0;
@@ -177,9 +177,9 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
       x = buff+st->frame_size;
 
       if (amount>1)
-         beta = 1-sqrt(.4*amount);
+         beta = 1-spx_sqrt(.4f*amount);
       else
-         beta = 1-0.63246*amount;
+         beta = 1-0.63246f*amount;
       if (beta<0)
          beta = 0;
 
@@ -201,11 +201,11 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
       if (order > 10)
          order = 10;
       /*order = 5+(irand(&st->seed)%6);*/
-      max_alpha = pow(.96+.04*(amount-1),order);
-      if (max_alpha > .98/(1.+beta2))
-         max_alpha = .98/(1.+beta2);
+      max_alpha = spx_pow(.96f+.04f*(amount-1),order);
+      if (max_alpha > .98f/(1.0f+beta2))
+         max_alpha = .98f/(1.0f+beta2);
 
-      alpha = alpha + .4*uni_rand(&st->seed);
+      alpha = alpha + .4f*uni_rand(&st->seed);
       if (alpha > max_alpha)
          alpha = max_alpha;
       if (alpha < -max_alpha)
@@ -228,11 +228,11 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
 
 #ifdef VORBIS_PSYCHO
       float frame[N];
-      float scale = 1./N;
+      float scale = 1.f/N;
       for (i=0;i<2*st->frame_size;i++)
          frame[i] = buff[i];
-   //float coef = .5*0.78130;
-      float coef = M_PI*0.075063 * 0.93763 * amount * .8 * 0.707;
+   //float coef = .5f*0.78130f;
+      float coef = M_PI*0.075063f * 0.93763f * amount * .8f * 0.707f;
       compute_curve(st->psy, buff, st->curve);
       for (i=1;i<st->frame_size;i++)
       {
@@ -241,13 +241,13 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
          do {
             x1 = uni_rand(&st->seed);
             x2 = uni_rand(&st->seed);
-         } while (x1*x1+x2*x2 > 1.);
-         gain = coef*sqrt(.1+st->curve[i]);
+         } while (x1*x1+x2*x2 > 1.f);
+         gain = coef*sqrt(.1f+st->curve[i]);
          frame[2*i-1] = gain*x1;
          frame[2*i] = gain*x2;
       }
-      frame[0] = coef*uni_rand(&st->seed)*sqrt(.1+st->curve[0]);
-      frame[2*st->frame_size-1] = coef*uni_rand(&st->seed)*sqrt(.1+st->curve[st->frame_size-1]);
+      frame[0] = coef*uni_rand(&st->seed)*sqrt(.1f+st->curve[0]);
+      frame[2*st->frame_size-1] = coef*uni_rand(&st->seed)*sqrt(.1f+st->curve[st->frame_size-1]);
       spx_drft_backward(&st->lookup,frame);
       for (i=0;i<2*st->frame_size;i++)
          frame[i] *= st->vorbis_win[i];
