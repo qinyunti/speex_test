@@ -8,6 +8,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <time.h>
+static uint64_t get_tm(void){
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC,&ts);
+    return ts.tv_sec*1000000000ull + ts.tv_nsec;
+}
+
 /* WAV解析 */
 #define CHUNK_RIFF "RIFF"
 #define CHUNK_WAVE "WAVE"
@@ -288,9 +295,11 @@ int main(int argc, char **argv)
    speex_echo_ctl(st, SPEEX_ECHO_SET_SAMPLING_RATE, &sampleRate);
 
    ctl_i=1;
-   speex_preprocess_ctl(den, SPEEX_PREPROCESS_SET_DENOISE, &ctl_i); /* 打开降噪 ctl_i=1打开 2关闭*/
-   ctl_i=-5;
+   speex_preprocess_ctl(den, SPEEX_PREPROCESS_SET_DENOISE, &ctl_i); /* 打开降噪 ctl_i=1打开 0关闭*/
+   ctl_i=80;
    speex_preprocess_ctl(den, SPEEX_PREPROCESS_SET_NOISE_SUPPRESS, &ctl_i); 
+   ctl_i=80;
+   speex_preprocess_ctl(den, SPEEX_PREPROCESS_SET_ECHO_SUPPRESS, &ctl_i);
 
    times = samps / NN;   /* 一次读取NN个点,读取times次 */
    for(int i=0; i<times; i++)
@@ -310,8 +319,15 @@ int main(int argc, char **argv)
         fclose(out_fd);
         exit(1);
       }
+
+      uint32_t t0;
+      uint32_t t1;
+	  t0 = get_tm();
       speex_echo_cancellation(st, mic_buf, spk_buf, out_buf);
       speex_preprocess_run(den, out_buf);
+      t1 = get_tm();
+      printf("used:%duS\r\n",(t1-t0)/1000);
+
       if(NN != fwrite(out_buf, sizeof(short), NN, out_fd)){
         fprintf(stderr, "write file %s err\n",out_fname);
         fclose(spk_fd);
@@ -327,3 +343,4 @@ int main(int argc, char **argv)
    fclose(mic_fd);
    return 0;
 }
+
