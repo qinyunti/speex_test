@@ -223,22 +223,28 @@ int main(int argc, char **argv)
       exit(1);
    }
    spk_fd = fopen(spk_fname, "rb");
-   if(spk_fd < 0){
+   if(spk_fd == NULL){
       fprintf(stderr, "open file %s err\n",spk_fname);
       exit(1);
+   }else{
+      fprintf(stderr, "open file %s ok\n",spk_fname);
    }
    mic_fd  = fopen(mic_fname,  "rb");
-   if(mic_fd < 0){
+   if(mic_fd == NULL){
       fprintf(stderr, "open file %s err\n",mic_fname);
       fclose(spk_fd);
       exit(1);
+   }else{
+      fprintf(stderr, "open file %s ok\n",mic_fname);
    }
    out_fd    = fopen(out_fname, "wb");
-   if(out_fd < 0){
+   if(out_fd == NULL){
       fprintf(stderr, "open file %s err\n",out_fname);
       fclose(spk_fd);
       fclose(mic_fd);
       exit(1);
+   }else{
+      fprintf(stderr, "open file %s ok\n",out_fname);
    }
 
    if(44 != fread(mic_wav_buf, 1, 44, mic_fd)){
@@ -247,6 +253,8 @@ int main(int argc, char **argv)
       fclose(mic_fd);
       fclose(out_fd);
       exit(1);
+   }else{
+      fprintf(stderr, "read file %s ok\n",mic_fname);
    }
    if(44 != fread(spk_wav_buf, 1, 44, spk_fd)){
       fprintf(stderr, "read file %s err\n",spk_fname);
@@ -254,6 +262,8 @@ int main(int argc, char **argv)
       fclose(mic_fd);
       fclose(out_fd);
       exit(1); 
+   }else{
+      fprintf(stderr, "read file %s ok\n",spk_fname);
    }
 
    if(0 != wav_decode_head(spk_wav_buf, &spk_wav)){
@@ -262,6 +272,8 @@ int main(int argc, char **argv)
       fclose(mic_fd);
       fclose(out_fd);
       exit(1); 
+   }else{
+      fprintf(stderr, "decode file %s ok\n",spk_fname);
    }
    printf("[spk_wav]\r\n");
    wav_print(&spk_wav);
@@ -271,6 +283,8 @@ int main(int argc, char **argv)
       fclose(mic_fd);
       fclose(out_fd);
       exit(1);  
+   }else{
+      fprintf(stderr, "decode file %s ok\n",mic_fname);
    }
    printf("[mic_wav]\r\n");
    wav_print(&mic_wav);
@@ -338,6 +352,7 @@ int main(int argc, char **argv)
    }
    speex_echo_state_destroy(st);
    speex_preprocess_state_destroy(den);
+
    fclose(out_fd);
    fclose(spk_fd);
    fclose(mic_fd);
